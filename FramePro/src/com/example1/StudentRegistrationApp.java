@@ -75,7 +75,7 @@ public class StudentRegistrationApp extends JFrame {
         gbc.gridx = 1;
         tfAge = new JTextField(5);
         formPanel.add(tfAge, gbc);
-
+        System.out.println("Hello Students");
         // Row 2 - Gender
         gbc.gridx = 0; gbc.gridy = 2;
         formPanel.add(new JLabel("Gender:"), gbc);
