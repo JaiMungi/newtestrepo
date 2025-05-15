@@ -11,6 +11,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Vector;
 import javax.swing.BorderFactory;
@@ -28,6 +30,15 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
+
 public class StudentRegistrationApp extends JFrame {
 
     // JDBC driver name and database URL
@@ -41,7 +52,8 @@ public class StudentRegistrationApp extends JFrame {
     // Swing components
     private JTextField tfName, tfAge, tfEmail, tfPhone;
     private JComboBox<String> cbGender, cbCourse;
-    private JButton btnRegister, btnExport;
+    private JButton btnRegister, btnExportExcel;
+    private JButton exportButtonPdf;
     private JTable table;
     private DefaultTableModel tableModel;
 
@@ -109,9 +121,11 @@ public class StudentRegistrationApp extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         JPanel btnPanel = new JPanel(new FlowLayout());
         btnRegister = new JButton("Register");
-        btnExport = new JButton("Export to Excel");
+        btnExportExcel = new JButton("Export to Excel");
+        exportButtonPdf = new JButton("Export to PDF");
         btnPanel.add(btnRegister);
-        btnPanel.add(btnExport);
+        btnPanel.add(btnExportExcel);
+        btnPanel.add(exportButtonPdf);
         formPanel.add(btnPanel, gbc);
         
         add(formPanel, BorderLayout.NORTH);
@@ -130,8 +144,8 @@ public class StudentRegistrationApp extends JFrame {
 
         // Button listeners
         btnRegister.addActionListener(e -> registerStudent());
-        btnExport.addActionListener(e -> exportToExcel());
-
+        btnExportExcel.addActionListener(e -> exportToExcel());
+        exportButtonPdf.addActionListener(e->exportDataToPDF());
         // Make UI responsive on smaller screen and avoid resizing issues
         setMinimumSize(new Dimension(700, 500));
     }
@@ -292,7 +306,72 @@ public class StudentRegistrationApp extends JFrame {
             }
         }
     }
+    private void exportDataToPDF() {
+        // Database connection parameters - please update these accordingly
+        String url = "jdbc:mysql://localhost:3306/student_manage";
+        String username = "root";
+        String password = "root";
 
+        // Query to fetch data to export
+        String sql = "SELECT * FROM students";
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Specify a file to save PDF");
+
+        int userSelection = fileChooser.showSaveDialog(this);
+
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+            if (!filePath.toLowerCase().endsWith(".pdf")) {
+                filePath += ".pdf";
+            }
+
+            Document document = new Document();
+
+            try (Connection conn = DriverManager.getConnection(url, username, password);
+                 Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(sql);
+                 FileOutputStream fos = new FileOutputStream(filePath)) {
+
+                PdfWriter.getInstance(document, fos);
+                document.open();
+
+                ResultSetMetaData rsmd = rs.getMetaData();
+                int columnCount = rsmd.getColumnCount();
+
+                PdfPTable pdfTable = new PdfPTable(columnCount);
+
+                // Add table headers
+                for (int i = 1; i <= columnCount; i++) {
+                    PdfPCell headerCell = new PdfPCell(new Paragraph(rsmd.getColumnName(i)));
+                    pdfTable.addCell(headerCell);
+                }
+
+                // Add table rows
+                while (rs.next()) {
+                    for (int i = 1; i <= columnCount; i++) {
+                        Object value = rs.getObject(i);
+                        pdfTable.addCell(value == null ? "" : value.toString());
+                    }
+                }
+
+                document.add(pdfTable);
+                document.close();
+
+                JOptionPane.showMessageDialog(this, "PDF exported successfully to:\n" + filePath);
+
+            } catch (SQLException sqle) {
+                JOptionPane.showMessageDialog(this, "SQL error: " + sqle.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                sqle.printStackTrace();
+            } catch (DocumentException de) {
+                JOptionPane.showMessageDialog(this, "Document error: " + de.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                de.printStackTrace();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+            }
+        }
+    }
     private void showError(String message) {
         JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
