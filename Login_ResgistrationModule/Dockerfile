@@ -8,7 +8,7 @@ RUN rm -rf /usr/local/tomcat/webapps/*
 COPY app.war /usr/local/tomcat/webapps/ROOT.war
 
 # Expose Tomcat default port
-EXPOSE 9090
+EXPOSE 8080
 
 # Run Tomcat server
 CMD ["catalina.sh", "run"]
