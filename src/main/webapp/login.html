@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login Page</title>
+    <style>
+        /* Reset some default styling */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+        .login-container {
+            background-color: #fff;
+            padding: 2.5rem 3rem;
+            border-radius: 12px;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+            width: 320px;
+            text-align: center;
+        }
+        .login-container h2 {
+            margin-bottom: 1.5rem;
+            color: #4a4a4a;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+            color: #555;
+            text-align: left;
+        }
+        input[type="text"], input[type="password"] {
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.2rem;
+            border: 1.8px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 6px #667eeaaa;
+        }
+        button {
+            background: #667eea;
+            border: none;
+            padding: 0.9rem 1rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 0.3rem;
+        }
+        button:hover {
+            background: #5a6ad9;
+        }
+        .forgot-password {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #667eea;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .forgot-password:hover {
+            color: #4a58c9;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container" role="main">
+    <h2>Login</h2>
+    <form action="login" method="get" aria-label="Login form">
+        <label for="username">Username</label>
+        <input
+                type="text"
+                id="username"
+                name="username"
+                placeholder="Enter your username"
+                required
+                autocomplete="username"
+        />
+        <label for="password">Password</label>
+        <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Enter your password"
+                required
+                autocomplete="current-password"
+        />
+        <button type="submit">Log In</button>
+<!--        <input type="submit" value="Submit">-->
+    </form>
+    <div class="forgot-password" tabindex="0">Forgot Password?</div>
+</div>
+</body>
+</html>
+
